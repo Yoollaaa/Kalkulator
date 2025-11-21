@@ -1,110 +1,147 @@
-let currentInput = '0';
-let calculationChain = ''; 
+let currentInput = ''; 
 let memory = 0;
 let historyLog = []; 
 
 const displayCurrent = document.getElementById('current-operand');
-const displayPrevious = document.getElementById('previous-operand');
+const displayPrevious = document.getElementById('previous-operand'); // Kita akan kosongkan ini biar rapi
 const historyList = document.getElementById('history-list');
 
-
 function updateDisplay() {
-    displayCurrent.innerText = currentInput;
-    displayPrevious.innerText = calculationChain;
+    if (currentInput === '') {
+        displayCurrent.innerText = '0';
+    } else {
+        displayCurrent.innerText = currentInput;
+    }
+    
+    displayPrevious.innerText = ''; 
 }
 
 function appendNumber(number) {
-    if (number === '.' && currentInput.includes('.')) return;
-    if (currentInput === '0' && number !== '.') {
-        currentInput = number;
+    if (number === '.' && currentInput.slice(-1) === '.') return;
+    
+    if (number === '.' && currentInput === '') {
+        currentInput = '0.';
     } else {
-        currentInput += number;
+        currentInput += number;  (Concatenate)
     }
+    
     updateDisplay();
 }
 
 function appendOperator(operator) {
-    if (currentInput === '') return;
-    calculationChain += currentInput + ' ' + operator + ' ';
-    currentInput = '0';
-    updateDisplay();
-}
+    if (currentInput === '') {
+        currentInput = '0';
+    }
 
-function clearDisplay() { 
-    currentInput = '0';
-    calculationChain = '';
+    const lastChar = currentInput.slice(-1);
+    if (['+', '-', '*', '/'].includes(lastChar)) {
+        currentInput = currentInput.slice(0, -1);
+    }
+    
+    currentInput += operator;
+    
     updateDisplay();
 }
 
 function deleteLast() { 
     currentInput = currentInput.toString().slice(0, -1);
-    if (currentInput === '' || currentInput === '-') currentInput = '0';
     updateDisplay();
 }
 
 function calculate() {
-    if (calculationChain === '' || currentInput === '') return;
+    if (currentInput === '') return;
 
-    const fullExpression = calculationChain + currentInput;
+    const originalExpression = currentInput;
     let result;
 
     try {
-        result = eval(fullExpression); 
+        result = eval(currentInput); 
         
         if (!isFinite(result)) {
             alert("Error: Tidak bisa membagi dengan nol!");
-            clearDisplay();
+            currentInput = '';
+            updateDisplay();
             return;
         }
         
-        addToHistory(fullExpression + " = " + result);
+        result = parseFloat(result.toFixed(8));
+
+        addToHistory(originalExpression + " = " + result);
         
         currentInput = result.toString();
-        calculationChain = '';
         updateDisplay();
         
     } catch (error) {
-        alert("Format perhitungan salah!");
-        clearDisplay();
+        alert("Format perhitungan belum selesai!");
     }
 }
 
-function memoryPlus() {
-    memory += parseFloat(currentInput);
-    alert("Memory stored: " + memory);
-}
+    const operators = ['+', '-', '*', '/'];
+    let lastOperatorIndex = -1;
 
-function memoryMinus() {
-    memory -= parseFloat(currentInput);
-    alert("Memory deducted: " + memory);
-}
+  
+    for (let op of operators) {
+        const index = currentInput.lastIndexOf(op);
+        if (index > lastOperatorIndex) {
+            lastOperatorIndex = index;
+        }
+    }
 
-function memoryRecall() {
-    currentInput = memory.toString();
+
+    if (lastOperatorIndex === -1) {
+        currentInput = '';
+    } else {
+        currentInput = currentInput.slice(0, lastOperatorIndex + 1);
+    }
+
+    updateDisplay();
+
+
+function clearDisplay() { 
+    currentInput = '';
+    displayPrevious.innerText = '';
     updateDisplay();
 }
 
-function memoryClear() {
-    memory = 0;
-    alert("Memory Cleared");
+function memoryPlus() { 
+    try {
+        memory += eval(currentInput || '0'); 
+        alert("Disimpan ke Memory: " + memory); 
+    } catch(e) {}
 }
+function memoryMinus() { 
+    try {
+        memory -= eval(currentInput || '0'); 
+        alert("Dikurang dari Memory: " + memory); 
+    } catch(e) {}
+}
+function memoryRecall() { 
+    if(currentInput !== '' && !['+', '-', '*', '/'].includes(currentInput.slice(-1))) {
+        currentInput = memory.toString();
+    } else {
+        currentInput += memory.toString();
+    }
+    updateDisplay(); 
+}
+function memoryClear() { memory = 0; alert("Memory Dikosongkan"); }
 
 function addToHistory(entry) {
     historyLog.unshift(entry);
-    
-    if (historyLog.length > 5) {
-        historyLog.pop();
-    }
+    if (historyLog.length > 5) historyLog.pop();
     renderHistory();
 }
 
 function renderHistory() {
     historyList.innerHTML = '';
-    historyLog.forEach(item => {
-        const li = document.createElement('li');
-        li.innerText = item;
-        historyList.appendChild(li);
-    });
+    if (historyLog.length === 0) {
+         historyList.innerHTML = '<li class="empty-msg">Belum ada perhitungan</li>';
+    } else {
+        historyLog.forEach(item => {
+            const li = document.createElement('li');
+            li.innerText = item;
+            historyList.appendChild(li);
+        });
+    }
 }
 
 function clearHistory() {
@@ -112,16 +149,14 @@ function clearHistory() {
     renderHistory();
 }
 
+
 document.addEventListener('keydown', function(event) {
     if (event.key >= 0 && event.key <= 9) appendNumber(event.key);
     if (event.key === '.') appendNumber('.');
-    if (event.key === '=' || event.key === 'Enter') {
-        event.preventDefault(); 
-        calculate();
-    }
+    if (event.key === '=' || event.key === 'Enter') { event.preventDefault(); calculate(); }
     if (event.key === 'Backspace') deleteLast();
     if (event.key === 'Escape') clearDisplay();
-    if (event.key === '+' || event.key === '-' || event.key === '*' || event.key === '/') {
-        appendOperator(event.key);
-    }
+    if (event.key === '+' || event.key === '-' || event.key === '*' || event.key === '/') appendOperator(event.key);
 });
+
+updateDisplay();
