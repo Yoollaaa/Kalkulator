@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Interaktif - Tugas Akhir</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="calculator">
+            <div class="display-screen">
+                <div class="previous-operand" id="previous-operand"></div>
+                <div class="current-operand" id="current-operand">0</div>
+            </div>
+
+            <div class="buttons-grid memory-row">
+                <button class="btn memory" onclick="memoryClear()">MC</button>
+                <button class="btn memory" onclick="memoryRecall()">MR</button>
+                <button class="btn memory" onclick="memoryPlus()">M+</button>
+                <button class="btn memory" onclick="memoryMinus()">M-</button>
+            </div>
+
+            <div class="buttons-grid">
+                <button class="btn operator" onclick="clearEntry()">CE</button>
+                <button class="btn operator" onclick="clearAll()">C</button>
+                <button class="btn operator" onclick="deleteNumber()">⌫</button>
+                <button class="btn operator" onclick="appendOperator('/')">÷</button>
+                
+                <button class="btn number" onclick="appendNumber('7')">7</button>
+                <button class="btn number" onclick="appendNumber('8')">8</button>
+                <button class="btn number" onclick="appendNumber('9')">9</button>
+                <button class="btn operator" onclick="appendOperator('*')">×</button>
+                
+                <button class="btn number" onclick="appendNumber('4')">4</button>
+                <button class="btn number" onclick="appendNumber('5')">5</button>
+                <button class="btn number" onclick="appendNumber('6')">6</button>
+                <button class="btn operator" onclick="appendOperator('-')">-</button>
+                
+                <button class="btn number" onclick="appendNumber('1')">1</button>
+                <button class="btn number" onclick="appendNumber('2')">2</button>
+                <button class="btn number" onclick="appendNumber('3')">3</button>
+                <button class="btn operator" onclick="appendOperator('+')">+</button>
+                
+                <button class="btn number span-two" onclick="appendNumber('0')">0</button>
+                <button class="btn number" onclick="appendNumber('.')">.</button>
+                <button class="btn equals" onclick="calculate()">=</button>
+            </div>
+        </div>
+
+        <div class="history-panel">
+            <h3>History (Last 5)</h3>
+            <ul id="history-list">
+                <li class="empty-msg">Belum ada perhitungan</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
